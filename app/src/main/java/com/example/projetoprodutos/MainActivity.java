@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private final int RESULT_CODE_NOVO_PRODUTO = 10;
     private final int REQUEST_CODE_EDITAR_PRODUTO = 2;
     private final int RESULT_CODE_PRODUTO_EDITADO = 11;
+    private final int RESULT_CODE_EXCLUIR_PRODUTO = 12;
     private int id = 0;
 
     private ListView listViewProdutos;
@@ -75,6 +76,11 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
             }
+        } else if (requestCode == REQUEST_CODE_EDITAR_PRODUTO && resultCode == RESULT_CODE_EXCLUIR_PRODUTO) {
+            int excluirProdutoId = data.getExtras().getInt("excluirProduto");
+            Produto excluirProduto = adapterProdutos.getItem(--excluirProdutoId);
+            adapterProdutos.remove(excluirProduto);
+            Toast.makeText(MainActivity.this, String.valueOf(excluirProdutoId), Toast.LENGTH_LONG).show();
         }
 
         super.onActivityResult(requestCode, resultCode, data);
