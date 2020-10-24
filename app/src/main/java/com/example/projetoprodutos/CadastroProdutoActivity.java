@@ -8,15 +8,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.projetoprodutos.database.ProdutoDAO;
 import com.example.projetoprodutos.modelo.Produto;
 
 import static android.widget.Toast.makeText;
 
 public class CadastroProdutoActivity extends AppCompatActivity {
 
-    private final int RESULT_CODE_NOVO_PRODUTO = 10;
-    private final int RESULT_CODE_PRODUTO_EDITADO = 11;
-    private final int RESULT_CODE_EXCLUIR_PRODUTO = 12;
     private boolean edicao = false;
     private int id = 0;
 
@@ -56,23 +54,27 @@ public class CadastroProdutoActivity extends AppCompatActivity {
         Produto produto = new Produto(nome, valor, id);
         Intent intent = new Intent();
 
-        if (edicao) {
-            intent.putExtra("produtoEditado", produto);
-            setResult(RESULT_CODE_PRODUTO_EDITADO, intent);
-        } else {
-            intent.putExtra("novoProduto", produto);
-            setResult(RESULT_CODE_NOVO_PRODUTO, intent);
-        }
 
-        finish();
+        ProdutoDAO produtoDao = new ProdutoDAO(getBaseContext());
+        boolean salvou = produtoDao.salvar(produto);
+        if (salvou) {
+            finish();
+        } else {
+            Toast.makeText(CadastroProdutoActivity.this, "erro ao salvar", Toast.LENGTH_LONG).show();
+        }
     }
 
     public void onClickExcluir(View v) {
-        Intent intent = new Intent();
+        Intent intent = getIntent();
+        if (intent != null && intent.getExtras() != null && intent.getExtras().get("produtoEdicao") != null) {
+            Produto produto = (Produto) intent.getExtras().getSerializable("produtoEdicao");
 
-        if (edicao) {
-            intent.putExtra("excluirProduto", id);
-            setResult(RESULT_CODE_EXCLUIR_PRODUTO, intent);
+            ProdutoDAO produtoDao = new ProdutoDAO(getBaseContext());
+            boolean excluiu = produtoDao.excluir(produto);
+
+            if (excluiu) {
+                Toast.makeText(CadastroProdutoActivity.this, "Produto excluido com sucesso", Toast.LENGTH_LONG).show();
+            }
         }
 
         finish();
